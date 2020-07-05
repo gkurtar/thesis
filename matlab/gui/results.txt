@@ -1,0 +1,110 @@
+
+homogeneous transformation matrix (RGB -> IR)
+1.000000 0.003200 0.000400 -25.496100 -0.003200 1.000000 0.007500 -1.110100 -0.000400 -0.007500 1.000000 3.330400 0.000000 0.000000 0.000000 1.000000 
+Camera Parameters:
+
+
+Camera Intrinsics
+IntrinsicMatrix:
+1042.895175 0.000000 0.000000 0.000000 1047.837362 0.000000 643.858419 478.387435 1.000000 
+FocalLength: 1042.895175 1047.837362 
+PrincipalPoint: 643.858419 478.387435 
+Skew: 0.000
+RadialDistortion: 0.0325 -0.1235 
+TangentialDistortion: 0.0000 0.0000 
+ImageSize: 960 1280 
+
+Camera Extrinsics 
+RotationMatrices: 3 3 36 matrix
+TranslationVectors: 36 3 matrix
+
+Accuracy of Estimation
+MeanReprojectionError: 0.397
+ReprojectionErrors: 247 2 36 matrix
+ReprojectedPoints: 247 2 36 matrix
+
+Calibration Settings
+NumPatterns: 36
+WorldUnits: mm
+WorldPoints: 247 2 matrix
+EstimateSkew: 0
+NumRadialDistortionCoefficients: 2
+EstimateTangentialDistortion: 0
+
+
+Rotation:
+0.999693 -0.001444 0.024747 0.005167 0.988513 -0.151049 -0.024245 0.151131 0.988216 
+
+Translation:
+-139.584773 -66.707762 1531.307015 
+
+Homogeneous transformation matrix from world to camera:
+0.999693 -0.001444 0.024747 -139.584773 0.005167 0.988513 -0.151049 -66.707762 -0.024245 0.151131 0.988216 1531.307015 0.000000 0.000000 0.000000 1.000000 
+
+CameraLocation:
+101.549928 297.965742 -1506.565311 
+
+Number of pts is 4, Clicked Image Points are:
+-295 
+164 
+568 
+446 
+593 
+446 
+620 
+444 
+
+Going to measure distances.
+
+
+
+pt 1 is -295 164 
+World Coordinates are:
+-1264.598633 -408.372803 0.000000 
+
+Distance from the camera is 2152.908 mm
+
+World point in RGB camera coordinate system:
+-1403.204834 -476.924255 1500.249146 1.000000 
+
+World point in IR camera coordinate system:
+-1429.626953 -462.292236 1507.717773 1.000000 
+
+
+pt 2 is 568 446 
+World Coordinates are:
+28.272635 19.714563 0.000000 
+
+Distance from the camera is 1533.797 mm
+
+World point in RGB camera coordinate system:
+-111.349304 -47.073570 1533.601074 1.000000 
+
+World point in IR camera coordinate system:
+-136.382599 -36.325344 1537.329102 1.000000 
+
+
+pt 3 is 593 446 
+World Coordinates are:
+64.893211 19.739857 0.000000 
+
+Distance from the camera is 1532.479 mm
+
+World point in RGB camera coordinate system:
+-74.740021 -46.859329 1532.717041 1.000000 
+
+World point in IR camera coordinate system:
+-99.772980 -36.234886 1536.428833 1.000000 
+
+
+pt 4 is 620 444 
+World Coordinates are:
+104.497101 16.796324 0.000000 
+
+Distance from the camera is 1532.581 mm
+
+World point in RGB camera coordinate system:
+-35.144051 -49.564396 1531.311890 1.000000 
+
+World point in IR camera coordinate system:
+-60.186234 -39.077194 1535.028076 1.000000 
