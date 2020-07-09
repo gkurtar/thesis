@@ -22,7 +22,7 @@ function varargout = gui_measure_distance(varargin)
 
 % Edit the above text to modify the response to help gui_measure_distance
 
-% Last Modified by GUIDE v2.5 30-Jun-2020 21:51:00
+% Last Modified by GUIDE v2.5 06-Jul-2020 19:49:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -73,8 +73,8 @@ function varargout = gui_measure_distance_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in pb_SelectInputFile.
-function pb_SelectInputFile_Callback(hObject, eventdata, handles)
+% --- Executes on button press in pbSelectInputFile.
+function pbSelectInputFile_Callback(hObject, eventdata, handles)
    
    %sel_dir = uigetdir;
    %fprintf ("sel dir is %s dene1\n", sel_dir);
@@ -100,14 +100,14 @@ function pb_SelectInputFile_Callback(hObject, eventdata, handles)
    end
 
    
-% hObject    handle to pb_SelectInputFile (see GCBO)
+% hObject    handle to pbSelectInputFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pb_SelectCalibrationFiles.
-function pb_SelectCalibrationFiles_Callback(hObject, eventdata, handles)
-% hObject    handle to pb_SelectCalibrationFiles (see GCBO)
+% --- Executes on button press in pbSelectCalibrationFiles.
+function pbSelectCalibrationFiles_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSelectCalibrationFiles (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -116,10 +116,8 @@ function pb_SelectCalibrationFiles_Callback(hObject, eventdata, handles)
    if isequal(sel_files, 0)
       disp('User selected Cancel');
    else
-      disp(['User selected other ', fullfile(sel_path,sel_files)]);
-	  disp("\ndene\n");
+      disp(['User selected ', fullfile(sel_path,sel_files)]);
 	  disp(length(sel_files));
-	  disp("\ndene\n");
 	  
       if ~iscell(sel_files)
          sel_files = {sel_files};
@@ -192,63 +190,80 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pbProcess.
-function pbProcess_Callback(hObject, eventdata, handles)
-% hObject    handle to pbProcess (see GCBO)
+% --- Executes on button press in pbCalRgbIrCam.
+function pbCalRgbIrCam_Callback(hObject, eventdata, handles)
+% hObject    handle to pbCalRgbIrCam (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-   strSize=get(handles.tbxSquareSize, 'String');
-   sqSize = str2num(strSize);
 
    listItems = get(handles.lbxImages, 'String');
    item_count = numel(listItems);
 
-   fprintf("\nitem count is: %d \n", item_count);
+   %fprintf("\nitem count is: %d \n", item_count);
 
    if (item_count <= 0)
       %set(handles.txtInfo, 'String', "Please select calibration images");
 	  fprintf("\nPlease select calibration images!\n");
       return;
    end
-
-   index_selected = get(handles.lbxImages, 'Value');
-   fprintf("\nselected idx is: %d \n", index_selected);
-
-   item_selected = listItems{index_selected};
-   fprintf("\nselected item is: %s \n", item_selected);
-
-%disp(item_count);
-%disp("END: item count\n");
-
-%for ix=1:length(listItems)
-%   item_selected = listItems{ix};
-%disp("list element: ");
-%disp(item_selected);
-%disp("   list element: ");
-%end
-
-   inputimage_selected= get(handles.tbxInputImage, 'String');
-
-   if exist(inputimage_selected, 'file') ~= 2
-      %set(handles.txtInfo, 'String', "input file does not exist");
-      fprintf("input file (%s) does not exist!", inputimage_selected);
-      return;
-   end
    
+   strSize=get(handles.tbxSquareSize, 'String');
+   sqSize = str2num(strSize);
    if (isnan(str2double(strSize)))
       %set(handles.txtInfo, 'String', "square size must be set as a numeric value");
       fprintf("Square size (%s) should be numeric!", strSize);
       return;
    end
+   
+   inputimage_selected = get(handles.tbxInputImage, 'String');
+   if exist(inputimage_selected, 'file') ~= 2
+      %set(handles.txtInfo, 'String', "input file does not exist");
+      fprintf("Input file (%s) does not exist!", inputimage_selected);
+      return;
+   end
+   
+   depth_data_file_selected = get(handles.tbxDepthInputFileLeft, 'String');
+   if exist(depth_data_file_selected, 'file') ~= 2
+      %set(handles.txtInfo, 'String', "input file does not exist");
+      fprintf("Depth data file (%s) does not exist!", depth_data_file_selected);
+      return;
+   end
 
-   %fun_measure_distance(listItems, index_selected, strSize);
-   [measured_distances, cameraParams] = ...
-      fun_measure_distance(listItems, inputimage_selected, strSize);
+   %index_selected = get(handles.lbxImages, 'Value');
+   %fprintf("\nselected idx is: %d \n", index_selected);
+   %item_selected = listItems{index_selected};
+   %fprintf("\nselected item is: %s \n", item_selected);
+   %[measured_distances, cameraParams] = ...
+   %   fun_measure_distance(listItems, inputimage_selected, strSize);
+
+   [cameraParams,depthCamParams] = fun_calibrate_cameras(...
+      listItems, inputimage_selected, depth_data_file_selected, strSize);
+   %fprintf("\n\nRGB/IR camera parameters are:\n%s", cameraParams);
+   fprintf("\n\nCamera Intrinsics");
+   fprintf("\nIntrinsicMatrix:\n");
+   fprintf("%f ", cameraParams.IntrinsicMatrix.');
+   fprintf("\nFocalLength: ");
+   fprintf("%f ", cameraParams.FocalLength.');
+   fprintf("\nPrincipalPoint: ");
+   fprintf("%f ", cameraParams.PrincipalPoint.');
+   fprintf("\nSkew: %0.3f", cameraParams.Skew);
+   fprintf("\nRadialDistortion: ");
+   fprintf("%0.4f ", cameraParams.RadialDistortion.');
+   fprintf("\nTangentialDistortion: ");
+   fprintf("%0.4f ", cameraParams.TangentialDistortion.');
+   fprintf("\nImageSize: ");
+   fprintf("%d ", cameraParams.ImageSize.');
+   fprintf("\n\nCamera Extrinsics ");
+   fprintf("\nRotationMatrices: ");
+   fprintf("%d ", size(cameraParams.RotationMatrices).');
+   fprintf("matrix\nTranslationVectors: ");
+   fprintf("%d ", size(cameraParams.TranslationVectors).');
+
+   fprintf("\n\nDepth camera parameters are determined as:\n%s", depthCamParams);
+
    %global camera_parameters;
    %camera_parameters = cameraParams;
-   return;
-
+return;
 
 
 function tbxInputImage_Callback(hObject, eventdata, handles)
@@ -306,18 +321,18 @@ selection = questdlg('Close?',...
    end
 
 
-function tbxDepthDataFile_Callback(hObject, eventdata, handles)
-% hObject    handle to tbxDepthDataFile (see GCBO)
+function tbxDepthDataFileRight_Callback(hObject, eventdata, handles)
+% hObject    handle to tbxDepthDataFileRight (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of tbxDepthDataFile as text
-%        str2double(get(hObject,'String')) returns contents of tbxDepthDataFile as a double
+% Hints: get(hObject,'String') returns contents of tbxDepthDataFileRight as text
+%        str2double(get(hObject,'String')) returns contents of tbxDepthDataFileRight as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function tbxDepthDataFile_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to tbxDepthDataFile (see GCBO)
+function tbxDepthDataFileRight_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to tbxDepthDataFileRight (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -328,9 +343,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pbSelectDepthDataFile.
-function pbSelectDepthDataFile_Callback(hObject, eventdata, handles)
-% hObject    handle to pbSelectDepthDataFile (see GCBO)
+% --- Executes on button press in pbSelectDepthDataFileRight.
+function pbSelectDepthDataFileRight_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSelectDepthDataFileRight (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -339,7 +354,7 @@ function pbSelectDepthDataFile_Callback(hObject, eventdata, handles)
       disp('User selected Cancel');
    else
       disp(['User selected ', fullfile(path,file)]);
-	  set(handles.tbxDepthDataFile, 'String', fullfile(path,file));
+	  set(handles.tbxDepthDataFileRight, 'String', fullfile(path,file));
    end
 
 
@@ -610,7 +625,7 @@ function pbAnalyse_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-   depth_data_file= get(handles.tbxDepthDataFile, 'String');
+   depth_data_file= get(handles.tbxDepthDataFileRight, 'String');
    fprintf("depth_data_file is %s \n", depth_data_file);
 
    if exist(depth_data_file, 'file') ~= 2
@@ -771,3 +786,67 @@ function tbxDCP2_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+function tbxDepthInputFileLeft_Callback(hObject, eventdata, handles)
+% hObject    handle to tbxDepthInputFileLeft (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of tbxDepthInputFileLeft as text
+%        str2double(get(hObject,'String')) returns contents of tbxDepthInputFileLeft as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function tbxDepthInputFileLeft_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to tbxDepthInputFileLeft (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pbSelectDepthInputFileLeft.
+function pbSelectDepthInputFileLeft_Callback(hObject, eventdata, handles)
+% hObject    handle to pbSelectDepthInputFileLeft (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+   [file, path] = uigetfile('*.*');
+   if isequal(file,0)
+      disp('User selected Cancel');
+   else
+      disp(['User selected ', fullfile(path, file)]);
+	  set(handles.tbxDepthInputFileLeft, 'String', fullfile(path, file));
+   end
+   
+return;
+
+% --- Executes on button press in pbCalDepthCam.
+function pbCalDepthCam_Callback(hObject, eventdata, handles)
+% hObject    handle to pbCalDepthCam (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+   inputimage_selected = get(handles.tbxInputImage, 'String');
+
+   if exist(inputimage_selected, 'file') ~= 2
+      %set(handles.txtInfo, 'String', "input file does not exist");
+      fprintf("Input file (%s) does not exist!", inputimage_selected);
+      return;
+   end
+   
+   depth_data_file_selected = get(handles.tbxDepthInputFileLeft, 'String');
+
+   if exist(depth_data_file_selected, 'file') ~= 2
+      %set(handles.txtInfo, 'String', "input file does not exist");
+      fprintf("Depth data file (%s) does not exist!", depth_data_file_selected);
+      return;
+   end
+
+return;

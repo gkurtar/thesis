@@ -112,9 +112,33 @@ title('Input Image');
 % the image was undistored. If we used the default 'same' option, it would be difficult
 % to notice any difference when compared to the original image. Notice the small black borders.
 [im, newOrigin] = undistortImage(imOrig, cameraParams, 'OutputView', 'full');
-figUndistorted = figure;
-imshow(im, 'InitialMagnification', magnification);
+%figUndistorted = figure;
+%imshow(im, 'InitialMagnification', magnification);
+%title('Undistorted Input Image');
+
+[y_size, x_size, z_size] = size(im);
+figUndistorted = figure('Toolbar', 'none', 'Menubar','none');
 title('Undistorted Input Image');
+hIm = imshow(im);
+hSP = imscrollpanel(figUndistorted, hIm);
+set(hSP,'Units', 'normalized', 'Position',[0 .1 1 .9]);
+% 2. Add a Magnification Box and an Overview tool.
+hMagBox = immagbox(figUndistorted, hIm);
+pos = get(hMagBox,'Position');
+set(hMagBox,'Position', [0 0 pos(3) pos(4)]);
+imoverview(hIm);
+% 3. Get the scroll panel API to programmatically control the view.
+api = iptgetapi(hSP);
+% 4. Get the current magnification and position.
+mag = api.getMagnification();
+r = api.getVisibleImageRect();
+% 5. View the top left corner of the image.
+api.setVisibleLocation(0.5, 0.5);
+% 6. Change the magnification to the value that just fits.
+api.setMagnification(api.findFitMag());
+% 7. Zoom in to 1600% on the dark spot.
+api.setMagnificationAndCenter(2, y_size / 2, x_size / 2);
+
 
 % Detect the checkerboard.
 [imagePoints, boardSize] = detectCheckerboardPoints(im);
