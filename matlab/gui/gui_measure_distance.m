@@ -259,7 +259,9 @@ function pbCalRgbIrCam_Callback(hObject, eventdata, handles)
    fprintf("matrix\nTranslationVectors: ");
    fprintf("%d ", size(cameraParams.TranslationVectors).');
 
-   fprintf("\n\nDepth camera parameters are determined as:\n%s", depthCamParams);
+   %fprintf("\n\nDepth camera parameters are determined as:\n%s", depthCamParams);
+   fprintf("\n\nDepth Cam Params is: %0.7f %0.7f\n",...
+      depthCamParams(1), depthCamParams(2));
 
    %global camera_parameters;
    %camera_parameters = cameraParams;
@@ -585,7 +587,7 @@ function lbxRois_Callback(hObject, eventdata, handles)
 	  %fprintf ("Splitted str is: ");
 	  %fprintf ("%s ", splitted_str{:});
 	  element_count = size(splitted_str);
-      fprintf ("  ???size is %d\n", element_count(1));
+      %fprintf ("  size is %d\n", element_count(1));
 	  if (element_count(1) == 6)
          set(handles.tbxXMin, 'String', splitted_str{1});
          set(handles.tbxXMax, 'String', splitted_str{2});

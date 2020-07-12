@@ -35,7 +35,7 @@ function [plmdl, rmse, center_line_residuals] = fun_fitplane(...
    roi_x_len = roi_x_max - roi_x_min;
    roi_y_len = roi_y_max - roi_y_min;
 
-   fileID = fopen('result_depth_analysis.txt', 'w');
+   fileID = fopen('depth_analysis.txt', 'w');
    fprintf(fileID, "===========================================\n");
    fprintf(fileID, "Height Index\tWidth Index\tDepth Value\tFitted Data\tDifference\n");
    fprintf(fileID, "===========================================\n");

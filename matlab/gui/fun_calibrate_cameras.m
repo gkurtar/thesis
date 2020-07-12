@@ -29,10 +29,9 @@ function [cameraParams, depthCamParams] = ...
    %file_to_process = argMeasurementFile;
    squareSize=str2num(argSquareSize);
 
-   file_result='results.txt';
+   file_result = 'calibration_results.txt';
    fileID = fopen(file_result, 'w');
    
-   file_detail_name='results_detailed.txt';
    %fprintf("\nfile_to_process is %s\n", argMeasurementFile);
 
    % homogeneous transformation matrix predefined
@@ -103,25 +102,17 @@ function [cameraParams, depthCamParams] = ...
    % Read input image
    magnification = 100;
    imOrig = imread(argMeasurementFile);
-   figure; imshow(imOrig, 'InitialMagnification', magnification);
+   %figure; imshow(imOrig, 'InitialMagnification', magnification);
+   %title('Input Image');
+ 
+   [y_size, x_size, z_size] = size(imOrig);
+   figInputImage = figure('Name', 'Input Image', 'Toolbar', 'none', 'Menubar', 'none');
    title('Input Image');
-   
-   % Since the lens introduced little distortion, use 'full' output view to illustrate that
-   % the image was undistored. If we used the default 'same' option, it would be difficult
-   % to notice any difference when compared to the original image. Notice the small black borders.
-   [im, newOrigin] = undistortImage(imOrig, cameraParams, 'OutputView', 'full');
-   %figUndistorted = figure;
-   %imshow(im, 'InitialMagnification', magnification);
-   %title('Undistorted Input Image');
-   
-   [y_size, x_size, z_size] = size(im);
-   figUndistorted = figure('Name', 'Undistorted Input Image', 'Toolbar', 'none', 'Menubar', 'none');
-   title('Undistorted Input Image');
-   hIm = imshow(im);
-   hSP = imscrollpanel(figUndistorted, hIm);
+   hIm = imshow(imOrig);
+   hSP = imscrollpanel(figInputImage, hIm);
    set(hSP,'Units', 'normalized', 'Position',[0 .1 1 .9]);
    % 2. Add a Magnification Box and an Overview tool.
-   hMagBox = immagbox(figUndistorted, hIm);
+   hMagBox = immagbox(figInputImage, hIm);
    pos = get(hMagBox,'Position');
    set(hMagBox,'Position', [0 0 pos(3) pos(4)]);
    imoverview(hIm);
@@ -136,6 +127,15 @@ function [cameraParams, depthCamParams] = ...
    api.setMagnification(api.findFitMag());
    % 7. Zoom in to 200% on the dark spot.
    api.setMagnificationAndCenter(2, y_size / 2, x_size / 2);
+
+
+   % Since the lens introduced little distortion, use 'full' output view to illustrate that
+   % the image was undistored. If we used the default 'same' option, it would be difficult
+   % to notice any difference when compared to the original image. Notice the small black borders.
+   [im, newOrigin] = undistortImage(imOrig, cameraParams, 'OutputView', 'full');
+   figUndistorted = figure;
+   imshow(im, 'InitialMagnification', magnification);
+   title('Undistorted Input Image');
    
    % Detect the checkerboard.
    [imagePoints, boardSize] = detectCheckerboardPoints(im);
@@ -165,7 +165,7 @@ function [cameraParams, depthCamParams] = ...
    fprintf (fileID, "%f ", cameraLocation.');
    
    % get image points via mouse click
-   [xpts, ypts] = getpts(figUndistorted);
+   [xpts, ypts] = getpts(figInputImage);
    pts = [xpts, ypts];
    disp(pts);
    numOfPts = size(pts,1);
